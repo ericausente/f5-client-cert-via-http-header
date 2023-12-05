@@ -1,12 +1,15 @@
 # f5-client-cert-via-http-header
 
-In scenarios where a f5's pool member is expecting the Client Certificate as an HTTP heade, we can delivering the client certificate via HTTP headers 
+This repository documents the process of configuring an F5 BIG-IP system to deliver client certificates as HTTP headers. This is particularly useful in scenarios where the F5 pool members expect client certificates to be received via HTTP headers for authentication purposes.
+Overview
 
+In certain configurations, F5's pool members require client certificates to be forwarded as part of the HTTP header for enhanced security and authentication. This document details a lab reproduction of the setup, including generating a dummy client certificate, configuring the F5 virtual server for two-way SSL authentication, and the necessary iRule to insert the certificate into the HTTP headers.
 
 ## Lab Reproduction Steps
 
-1. Virtual Server Configuration: The Virtual Server was set to Client SSL in a two-way mode (see  K12140946: Configuring the BIG-IP system to perform two-way SSL authentication)
-3. Certificate Generation: A Client certificate and key were generated in F5 (dummy) and imported as Client Certificate and Key, named "Client-cert".
+### Virtual Server Configuration: The Virtual Server was set to Client SSL in a two-way mode (see  K12140946: Configuring the BIG-IP system to perform two-way SSL authentication)
+
+### Certificate Generation: A Client certificate and key were generated in F5 (dummy) and imported as Client Certificate and Key, named "Client-cert".
   
 To generate a dummy client certificate and key using OpenSSL and then import it into the F5 system, you would typically follow these steps:
 
@@ -30,7 +33,7 @@ openssl x509 -req -days 365 -in client.csr -signkey client.key -out client.crt
 
 This command uses the CSR (client.csr) and the private key (client.key) to create a self-signed certificate (client.crt) valid for 365 days.
 
-Importing the Certificate and Key in F5
+### Importing the Certificate and Key in F5
 
 - Access the F5 BIG-IP Configuration Utility
 - Import the Certificate and Key:
@@ -39,7 +42,7 @@ Importing the Certificate and Key in F5
 
 - Name the Certificate and Key: When importing, name them as Client-cert or another identifiable name.
 
-Configuring Client SSL Profile in F5
+### Configuring Client SSL Profile in F5
     Set the Profile to Require Client Certificates:
         Under Configuration, select Advanced.
         Set Client Certificate to Require.
@@ -52,7 +55,8 @@ After completing these steps, the F5 system will be configured to use the genera
 
 
 
-Attach the following Irule to the virtual server. 
+### Attach the following Irule to the virtual server. 
+The iRule is configured on the F5 system to extract the client certificate from the SSL handshake and insert it into the HTTP header for forwarding to the pool members.
 
 ```
 when RULE_INIT {
@@ -103,7 +107,9 @@ when HTTP_REQUEST {
 ```
 
 
-Copy Client Certificate and Key to the Client Machine: The client.crt (certificate) and client.key (private key) files are copied to the client machine.
+### Copy Client Certificate and Key to the Client Machine 
+
+The client.crt (certificate) and client.key (private key) files are copied to the client machine.
 
 Execute Curl Command: On the client machine, the following command is executed:
 ```
@@ -118,7 +124,8 @@ The options used are:
     --cert client.crt: Specifies the client certificate file.
     --key client.key: Specifies the client private key file.
 
-Monitor the LTM Log: Simultaneously, the log file /var/log/ltm on the F5 server is monitored (typically using a command like tail -f /var/log/ltm) to observe real-time logging of the event.
+### Monitor the LTM Log
+Simultaneously, the log file /var/log/ltm on the F5 server is monitored (typically using a command like tail -f /var/log/ltm) to observe real-time logging of the event.
 
 Output of /var/log/ltm: 
 ````
