@@ -7,9 +7,11 @@ In certain configurations, F5's pool members require client certificates to be f
 
 ## Lab Reproduction Steps
 
-### Virtual Server Configuration: The Virtual Server was set to Client SSL in a two-way mode (see  K12140946: Configuring the BIG-IP system to perform two-way SSL authentication)
+### Virtual Server Configuration
+The Virtual Server was set to Client SSL in a two-way mode (see  K12140946: Configuring the BIG-IP system to perform two-way SSL authentication)
 
-### Certificate Generation: A Client certificate and key were generated in F5 (dummy) and imported as Client Certificate and Key, named "Client-cert".
+### Certificate Generation
+A Client certificate and key were generated in F5 (dummy) and imported as Client Certificate and Key, named "Client-cert".
   
 To generate a dummy client certificate and key using OpenSSL and then import it into the F5 system, you would typically follow these steps:
 
